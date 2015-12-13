@@ -11,7 +11,7 @@ public class GridAttack {
 
 	public int damage = 1;	//Damage of attack
 	public int pushBack = 0; 	//Tiles the target is pushed back after being hit.
-	public int range = 1;		//Range of attack
+	public int range = 5;		//Range of attack
 	public bool trailEffect = true; //All tiles between target and caster are also being hit.
 	public bool canPassWalls = false; //If it hits a wall then it will continue its path or not.
 	public bool canPassObjects = false; // If it hits an object (or enemy or anything else thats not a wall but has an attack catcher)
@@ -20,12 +20,22 @@ public class GridAttack {
 	public int dmgTrailEffectMod = 0; //Mod in dmg if hit by trail effect
 	public int dmgAreaEffectMod = 0; //Mod in dmg if hit by area effect
 
-	public void Use(DungeonTile startTile, DungeonTile targetTile,GridHolder gridHolder){
+	public void Use(DungeonTile startTile, DungeonTile targetTileGiven,GridHolder gridHolder){
 		DungeonTile currentTile = null;
+		DungeonTile targetTile = null;
 		//DungeonTile nextTile = null;
 
-		int difX = (int)targetTile.gridPosition.x - (int)startTile.gridPosition.x;
-		int difY = (int)targetTile.gridPosition.y - (int)startTile.gridPosition.y;
+		int difX = (int)targetTileGiven.gridPosition.x - (int)startTile.gridPosition.x;
+		int difY = (int)targetTileGiven.gridPosition.y - (int)startTile.gridPosition.y;
+
+		if (difX > range) {
+			difX = range;
+		}
+		if (difY > range) {
+			difY = range;
+		}
+
+		targetTile = gridHolder.GetTile((int)startTile.gridPosition.x + difX,(int)startTile.gridPosition.y + difY);
 
 		int dirX = 0;
 		int dirY = 0;
