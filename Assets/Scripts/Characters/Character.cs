@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 public class Character : GridObject {
-	
-	protected GridMovement _movement; 
+
+	protected string _type = "Default"; // TODO must be set to; Human, Orc, Dog etc etc... (This way dogs can choose to attack everything except their own kind (type))
+
+	protected GridMovement _movement;
+	protected GridCombat _combat;
 	protected TurnUser _turnUser;
 	
 	protected Sight _sight;
 	protected bool _discoverTiles = false;
 	protected bool _seeEffectOnTiles = false;
 	protected Vector2 _faceDir = Vector2.left;
-	
-	//protected int _characterX; //TODO gridObject position, not only characers are placed on the grid..
-	//protected int _characterY;
 	
 	//Player Stats
 	protected Attributes _attributes = new Attributes();
@@ -26,6 +26,7 @@ public class Character : GridObject {
 		_sight = gameObject.AddComponent<Sight> ();
 		_turnUser = gameObject.AddComponent<TurnUser> ();
 		_movement = gameObject.AddComponent<GridMovement> ();
+		_combat = gameObject.AddComponent<GridCombat> ();
 		_movement.MoveSetPosition += CharacterMoved;
 		_turnUser.UserGainedTurn += TurnGained;
 	}
@@ -45,9 +46,9 @@ public class Character : GridObject {
 		See ();
 	}
 
-	protected void DidAction(){
+	protected void DidAction(int subTurnWeight = 1){
 		See ();
-		_turnUser.PassSubTurn();
+		_turnUser.PassSubTurn(subTurnWeight);
 	}
 
 	private void See(){
@@ -67,5 +68,6 @@ public class Character : GridObject {
 	{
 		base.SetGridHolder (gh);
 		_movement.gridHolder = gh;
+		_combat.gridHolder = gh;
 	}
 }

@@ -34,7 +34,6 @@ public class TurnUser : MonoBehaviour {
 		}
 		_subTurnsPassed += amount;
 		if (_subTurnsPassed == totalSubTurns) {
-			_subTurnsPassed = 0;
 			PassTurn();
 		}
 	}
@@ -52,6 +51,7 @@ public class TurnUser : MonoBehaviour {
 	}
 	//Turn system geeft dit object e beurt.
 	public void GainTurn(){
+		_subTurnsPassed = 0;
 		_inTurn = true;
 		if (UserGainedTurn != null) {
 			UserGainedTurn(this);

@@ -7,6 +7,7 @@ public class GridObject : MonoBehaviour {
 	private DungeonTile _tileOn = null;
 	private int _gridPositionX = 0;
 	private int _gridPositionY = 0;
+	protected bool _passAble = false;
 
 	public virtual void SetPositionData(int x, int y, bool setAsTileObject = true){
 		if (_tileOn != null) {
@@ -41,5 +42,11 @@ public class GridObject : MonoBehaviour {
 	}
 	public int gridPositionY{
 		get{return _gridPositionY;}
+	}
+	public DungeonTile currentTileOn{
+		get{return _tileOn;}
+	}
+	public bool passAble{
+		get{return _passAble;}
 	}
 }

@@ -5,6 +5,7 @@ public class Player : Character {
 
 	//Player Stats
 	private LevelingSystem _levelSystem = new LevelingSystem();
+	private GridAttack testAttack = new GridAttack ();
 
 	//Bij start van een nieuwe dungeon (niet floor maar daadwerkelijk een gehele dungeon) dan start weer op level 1. (bedenk er een leuke story bij)
 
@@ -33,6 +34,10 @@ public class Player : Character {
 			if (Input.GetKey (KeyCode.DownArrow)) {
 				_faceDir = Vector2.down;
 				_movement.Move (Vector2.down);
+			}
+
+			if (Input.GetKeyDown (KeyCode.W)) {
+				_combat.Attack(currentTileOn,testAttack,_faceDir);
 			}
 		}
 	}
