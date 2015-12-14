@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GridAttack {
 
@@ -23,7 +24,7 @@ public class GridAttack {
 	public void Use(DungeonTile startTile, DungeonTile targetTileGiven,GridHolder gridHolder){
 		DungeonTile currentTile = null;
 		DungeonTile targetTile = null;
-		//DungeonTile nextTile = null;
+		DungeonTile preTile = null;
 
 		int difX = (int)targetTileGiven.gridPosition.x - (int)startTile.gridPosition.x;
 		int difY = (int)targetTileGiven.gridPosition.y - (int)startTile.gridPosition.y;
@@ -50,25 +51,60 @@ public class GridAttack {
 		for (int yRow = 0; yRow < Mathf.Abs(difY) + 1; yRow ++) {
 			for(int xRow = 0; xRow < Mathf.Abs(difX) + 1; xRow ++){
 				currentTile = gridHolder.GetTile((int)startTile.gridPosition.x +  (xRow * dirX),(int)startTile.gridPosition.y + (yRow * dirY));
-				//nextTile = gridHolder.GetTile((int)startTile.gridPosition.x + ((xRow + 1) * dirX),(int)startTile.gridPosition.y + ((yRow + 1) * dirY));
-
-				Debug.Log(xRow * dirX);
 				if(currentTile != null){
 					if(currentTile != targetTile && (!currentTile.isWall || canPassWalls)){ // TODO If it hits an object and canPassObjects is false then also end attack with red tile
 						if(trailEffect){
 							// dmg = damage + dmgTrailEffectMod 
 							//TODO Check for Attack Catcher on all objects on tile
+							AttackObjectsOnTile(GetModGridAttack(dmgTrailEffectMod),currentTile,new Vector2(dirX,dirY));
 							currentTile.GetComponent<SpriteRenderer>().color = Color.blue;
+							if(TileInTrailEffect != null){
+								TileInTrailEffect(currentTile);
+							}
 						}
 					}else{
 						//TODO Check for Attack Catcher on all objects on tile
+						AttackObjectsOnTile(this,currentTile,new Vector2(dirX,dirY));
 						currentTile.GetComponent<SpriteRenderer>().color = Color.red;
+						if(TileInTarget != null){
+							TileInTarget(currentTile);
+						}
 						break;
 					}
 				}
+				preTile = currentTile; // can be used if you hit a wall that you calculate the area effect from the pretile and not the currentTile. (STILL AN IDEA!)
 			}
 		}
 
 		//TODO area effect. Loop from target tile X - range to X + range && Y - Range to Y + range where range == areaEffect variable
+	}
+
+	private void AttackObjectsOnTile(GridAttack attack, DungeonTile tile, Vector2 dir){
+		List<GameObject> allObjects = tile.objectsOnTile;
+		GameObject currentObj;
+		GridAttackCatcher attCatcher;
+		int l = allObjects.Count;
+		for (int i = l - 1; i >= 0; i--) {
+			currentObj = allObjects[i];
+			attCatcher = currentObj.GetComponent<GridAttackCatcher>();
+			if(attCatcher != null){
+				attCatcher.CatchAttack(attack,dir);
+			}
+		}
+	}
+
+	private GridAttack GetModGridAttack(int modDmg, int modPushBack = 0){
+		GridAttack gridAttack = new GridAttack ();
+		gridAttack.damage = damage + modDmg;
+		gridAttack.pushBack = pushBack + modPushBack; 	//Tiles the target is pushed back after being hit.
+		gridAttack.range = range;		//Range of attack
+		gridAttack.trailEffect = trailEffect; //All tiles between target and caster are also being hit.
+		gridAttack.canPassWalls = canPassWalls; //If it hits a wall then it will continue its path or not.
+		gridAttack.canPassObjects = canPassObjects; // If it hits an object (or enemy or anything else thats not a wall but has an attack catcher)
+		gridAttack.areaEffect = areaEffect; // tiles around hit tile are effected with dmg
+		
+		gridAttack.dmgTrailEffectMod = dmgTrailEffectMod; //Mod in dmg if hit by trail effect
+		gridAttack.dmgAreaEffectMod = dmgAreaEffectMod; //Mod in dmg if hit by area effect
+		return gridAttack;
 	}
 }
